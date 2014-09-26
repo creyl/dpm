@@ -19,14 +19,13 @@ Meteor.startup(function () {
   Transactions.remove({});
   
   // Seed user buys uniform payoff profile
-  var seedUser = Users.findOne(userId[0]);
-  addTransaction(seedUser, States.findOne(stateId1), unitPayoff*100);
-  addTransaction(seedUser, States.findOne(stateId2), unitPayoff*100);
+  addTransaction(userId[0], stateId1, unitPayoff*100);
+  addTransaction(userId[0], stateId2, unitPayoff*100);
   
   for (var i = 1; i < nUsers; i++) {
     addTransaction(
-      Users.findOne(userId[i % nUsers]),
-      States.findOne((i % 2)===0 ? stateId1 : stateId2),
+      userId[i % nUsers],
+      (i % 2)===0 ? stateId1 : stateId2,
       unitPayoff*10);
   }
 }

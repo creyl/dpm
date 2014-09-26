@@ -3,33 +3,34 @@
  * in order to guarantee that the States and Users info remains in-sync.
  * Must be global.
  *
- * @param {number} userId
- * @param {number} stateId
+ * @param {string} userId
+ * @param {string} stateId
  * @param {number} payoff - A positive or negative number
  */
-addTransaction = function (user, state, payoff) {
+addTransaction = function (userId, stateId, payoff) {
   var transactionId = Transactions.insert({
-    timeStamp: (new Date()).toISOString(), 
-    user: user,
-    state: state,
+    timeStamp: (new Date()).toISOString(), // TODO: Make sure we get server time, not client time
+    user: Users.findOne(userId),
+    state: States.findOne(stateId),
     payoff: payoff
   });
-  console.log(Transactions.findOne(transactionId));
+  var transaction = Transactions.findOne(transactionId);
+  console.log("***New transaction:", transaction.timeStamp, transaction.user.name, (transaction.payoff>0) ? "Buys" : "Sells", "<", transaction.state.name, ">");
 
   var preTransactionInvestment = calcInvestment(States, lambda);
-  States.update(state._id, {$inc: {payoff: payoff}});
-  console.log(States.findOne(state._id));
+  States.update(stateId, {$inc: {payoff: payoff}});
+//   console.log(States.findOne(stateId));
   var postTransactionInvestment = calcInvestment(States, lambda);
 
-  var payoffCursor = PayoffByUserByState.find({userId: user._id, stateId: state._id});
+  var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
   var payoffId;
   if (payoffCursor.count() === 0)
-    payoffId = PayoffByUserByState.insert({userId: user._id, stateId: state._id, payoff: payoff});
+    payoffId = PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
   else {
     payoffId = payoffCursor.fetch()[0]._id;
     PayoffByUserByState.update(payoffId, {$inc: {payoff: payoff}});
   }
-  console.log(PayoffByUserByState.findOne(payoffId));
+//   console.log(PayoffByUserByState.findOne(payoffId));
 
   // Update all unit payoff prices
   updateUnitPayoffPrices(States, lambda, unitPayoff);
@@ -38,11 +39,11 @@ addTransaction = function (user, state, payoff) {
   Users.find({}).forEach(function (userIt) {
     var payoffArraySortedByState = PayoffByUserByState.find({userId: userIt._id}, {sort: {stateId: 1}}).fetch();
     var cash = Users.findOne(userIt._id).cash;
-    if (userIt._id === user._id)
+    if (userIt._id === userId)
       cash += preTransactionInvestment - postTransactionInvestment;
     var liquidationValue = calcLiquidationValue(payoffArraySortedByState, States, lambda);
     Users.update(userIt._id, {$set: {cash: cash, liquidationValue: liquidationValue, profit: cash + liquidationValue}});
-    console.log(Users.findOne(userIt._id));
+//     console.log(Users.findOne(userIt._id));
   });
 }
 
@@ -96,11 +97,14 @@ var updateUnitPayoffPrices = function (states, lambda, unitPayoff) {
   });
 }
 
-// This function liquidates a user's position
-// Must be global
-liquidate = function (user, states) {
-  PayoffByUserByState.find({userId: user._id}).forEach(function (pbubs) {
-    addTransaction(pbubs.userId, pbubs.stateId, -pbubs.payoff);
+/**
+ * This function liquidates a user's position.
+ * Must be global.
+ * @param {string} userId
+ */
+liquidate = function (userId) {
+  PayoffByUserByState.find({userId: userId}).forEach(function (pbubs) {
+    addTransaction(userId, pbubs.stateId, -pbubs.payoff);
   }
                                                       );
 }

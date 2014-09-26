@@ -1,7 +1,7 @@
 // testing file sync again
 // TODO:
 // * implement seeding of DPM
-// * disable "sell" button for users with zero payoff
+// * disable "sell" and "liquidate" buttons for users with zero payoff
 
 
 Meteor.startup(function () {
@@ -15,10 +15,6 @@ Meteor.startup(function () {
   Session.set('myId', myId);
   console.log(Users.findOne(myId));
 });
-
-Template.dpm.transactions = function () {
-  return Transactions.find({}, {sort: {timeStamp: -1}, limit: 50});
-};
 
 Template.dpm.states = function () {
   return States.find({}, {
@@ -54,13 +50,13 @@ Template.dpm.events({
     Users.update(Session.get('myId'), {$set: {name: name}});
   },
   'click input.sell': function () {
-    addTransaction(Users.findOne(Session.get('myId')), this, -unitPayoff);
+    addTransaction(Session.get('myId'), this._id, -unitPayoff);
   },
   'click input.buy': function () {
-    addTransaction(Users.findOne(Session.get('myId')), this, unitPayoff);
+    addTransaction(Session.get('myId'), this._id, unitPayoff);
   },
   'click input.liquidate': function () {
-    liquidate(Users.findOne(this, States));
+    liquidate(this._id);
   }
 });
 
