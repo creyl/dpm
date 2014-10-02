@@ -53,13 +53,13 @@ Template.dpm.events({
         Users.update(Session.get('myId'), {$set: {name: name}});
     },
     'click input.sell': function () {
-        addTransaction(Session.get('myId'), this._id, -unitPayoff);
+        Meteor.call("addTransaction", Session.get('myId'), this._id, -UNIT_PAYOFF);
     },
     'click input.buy': function () {
-        addTransaction(Session.get('myId'), this._id, unitPayoff);
+        Meteor.call("addTransaction", Session.get('myId'), this._id, UNIT_PAYOFF);
     },
     'click input.liquidate': function () {
-        liquidate(this._id);
+        Meteor.call("liquidate", this._id);
     }
 });
 

@@ -5,5 +5,5 @@
 
 standard-app-packages
 #autopublish
-insecure
+#insecure
 bootstrap

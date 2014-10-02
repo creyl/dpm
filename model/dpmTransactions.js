@@ -1,57 +1,68 @@
-/**
- * This function should be the only way to add to the Transactions collection
- * in order to guarantee that the States and Users info remains in-sync.
- * Must be global.
- *
- * @param {string} userId
- * @param {string} stateId
- * @param {number} payoff - A positive or negative number
- */
-addTransaction = function (userId, stateId, payoff) {
-    var transactionId = Transactions.insert({
-        timeStamp: (new Date()).toISOString(), // TODO: Make sure we get server time, not client time
-        user: Users.findOne(userId),
-        state: States.findOne(stateId),
-        payoff: payoff
-    });
-    var transaction = Transactions.findOne(transactionId);
-    console.log("***New transaction:", transaction.timeStamp, transaction.user.name, (transaction.payoff > 0) ? "Buys" : "Sells", "<", transaction.state.name, ">");
-
-    var preTransactionInvestment = calcInvestment(States, lambda);
-    States.update(stateId, {$inc: {payoff: payoff}});
-//   console.log(States.findOne(stateId));
-    var postTransactionInvestment = calcInvestment(States, lambda);
-
-    var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
-    var payoffId;
-    if (payoffCursor.count() === 0)
-        payoffId = PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
-    else {
-        payoffId = payoffCursor.fetch()[0]._id;
-        PayoffByUserByState.update(payoffId, {$inc: {payoff: payoff}});
-    }
-//   console.log(PayoffByUserByState.findOne(payoffId));
-
-    // Update all unit payoff prices
-    updateUnitPayoffPrices(States, lambda, unitPayoff);
-
-    // Update the P&L for all users
-    Users.find({}).forEach(function (userIt) {
-        var payoffArraySortedByState = PayoffByUserByState.find({userId: userIt._id}, {sort: {stateId: 1}}).fetch();
-        var cash = Users.findOne(userIt._id).cash;
-        if (userIt._id === userId)
-            cash += preTransactionInvestment - postTransactionInvestment;
-        var liquidationValue = calcLiquidationValue(payoffArraySortedByState, States, lambda);
-        Users.update(userIt._id, {
-            $set: {
-                cash: cash,
-                liquidationValue: liquidationValue,
-                profit: cash + liquidationValue
-            }
+Meteor.methods({
+    /**
+     * This method must be the only way to add to the Transactions collection
+     * in order to guarantee that the States and Users info remains in-sync.
+     * Must be global.
+     *
+     * @param {string} userId
+     * @param {string} stateId
+     * @param {number} payoff - A positive or negative number
+     */
+    addTransaction: function (userId, stateId, payoff) {
+        var transactionId = Transactions.insert({
+            timeStamp: (new Date()).toISOString(), // TODO: Make sure we get server's timestamp, not client's
+            user: Users.findOne(userId),
+            state: States.findOne(stateId),
+            payoff: payoff
         });
-//     console.log(Users.findOne(userIt._id));
-    });
-}
+        var transaction = Transactions.findOne(transactionId);
+        console.log("***New transaction:", transaction.timeStamp, transaction.user.name, (transaction.payoff > 0) ? "Buys" : "Sells", "<", transaction.state.name, ">");
+
+        var preTransactionInvestment = calcInvestment(States, LAMBDA);
+        States.update(stateId, {$inc: {payoff: payoff}});
+        var postTransactionInvestment = calcInvestment(States, LAMBDA);
+
+        var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
+        if (payoffCursor.count() === 0)
+            PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
+        else {
+            var payoffId = payoffCursor.fetch()[0]._id;
+            PayoffByUserByState.update(payoffId, {$inc: {payoff: payoff}});
+        }
+
+        // Update all unit payoff prices
+        updateUnitPayoffPrices(States, LAMBDA, UNIT_PAYOFF);
+
+        // Update the P&L for all users
+        Users.find({}).forEach(function (userIt) {
+            var payoffArraySortedByState = PayoffByUserByState.find({userId: userIt._id}, {sort: {stateId: 1}}).fetch();
+            var cash = Users.findOne(userIt._id).cash;
+            if (userIt._id === userId)
+                cash += preTransactionInvestment - postTransactionInvestment;
+            var liquidationValue = calcLiquidationValue(payoffArraySortedByState, States, LAMBDA);
+            Users.update(userIt._id, {
+                $set: {
+                    cash: cash,
+                    liquidationValue: liquidationValue,
+                    profit: cash + liquidationValue
+                }
+            });
+        });
+    },
+
+    /**
+     * This function liquidates a user's position.
+     * Must be global.
+     * @param {string} userId
+     */
+    liquidate: function (userId) {
+        PayoffByUserByState.find({userId: userId}).forEach(
+            function (pbubs) {
+                Meteor.call("addTransaction", userId, pbubs.stateId, -pbubs.payoff);
+            }
+        );
+    }
+});
 
 // This function returns the required investment for the entire DPM
 var calcInvestment = function (states, lambda) {
@@ -61,7 +72,7 @@ var calcInvestment = function (states, lambda) {
     });
     investment = Math.pow(investment, 1.0 / lambda);
     return investment;
-}
+};
 
 // This functions returns the liquidation value for a user's aggregate payoff profile
 var calcLiquidationValue = function (payoffArraySortedByState, states, lambda) {
@@ -82,7 +93,7 @@ var calcLiquidationValue = function (payoffArraySortedByState, states, lambda) {
     investment0 = Math.pow(investment0, 1.0 / lambda);
     investment1 = Math.pow(investment1, 1.0 / lambda);
     return (investment0 - investment1);
-}
+};
 
 // This function updates the unit payoff prices for each state
 var updateUnitPayoffPrices = function (states, lambda, unitPayoff) {
@@ -101,16 +112,5 @@ var updateUnitPayoffPrices = function (states, lambda, unitPayoff) {
         states.update(stateA._id, {$set: {unitPayoffOffer: investment1 - investment0}});
         states.update(stateA._id, {$set: {unitPayoffBid: -investment2 + investment0}});
     });
-}
+};
 
-/**
- * This function liquidates a user's position.
- * Must be global.
- * @param {string} userId
- */
-liquidate = function (userId) {
-    PayoffByUserByState.find({userId: userId}).forEach(function (pbubs) {
-            addTransaction(userId, pbubs.stateId, -pbubs.payoff);
-        }
-    );
-}

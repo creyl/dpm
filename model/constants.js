@@ -1,2 +1,2 @@
-lambda = 5.0; // Defines the lambda-norm
-unitPayoff = 1.0;
+LAMBDA = 5.0; // Defines the lambda-norm
+UNIT_PAYOFF = 1.0;
