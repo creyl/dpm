@@ -6,14 +6,19 @@ Meteor.startup(function () {
         var stateId1 = States.insert({name: "Brazil wins", payoff: 0, unitPayoffBid: 0, unitPayoffOffer: UNIT_PAYOFF});
         var stateId2 = States.insert({name: "Brazil loses", payoff: 0, unitPayoffBid: 0, unitPayoffOffer: UNIT_PAYOFF});
 
-        Users.remove({});
+// Additional fields for Meteor.users -- {
+//           cash: Number,
+//           liquidationValue: Number,
+//           profit: Number}
+        Meteor.users.remove({});  // REMOVE ALL USERS
         var names = [
             "Seed", "Ada Lovelace", "Grace Hopper", "Marie Curie", "Carl Friedrich Gauss",
             "Nikola Tesla"];
         var userId = [, , , , ,];
         for (var i = 0; i < names.length; i++)
-            userId[i] = Users.insert({name: names[i], cash: 0, liquidationValue: 0, profit: 0});
-        var nUsers = Users.find({}).count();
+            userId[i] = Accounts.createUser({username: names[i], cash: 0, liquidationValue: 0, profit: 0});
+        var nUsers = Meteor.users.find({}).count();
+        console.log('There are', nUsers, " users after startup.");
 
         Transactions.remove({});
 

@@ -4,6 +4,10 @@
 # but you can also edit it by hand.
 
 standard-app-packages
+bootstrap
+accounts-password
+accounts-ui
+
 #autopublish
 #insecure
-bootstrap
+

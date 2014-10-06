@@ -3,21 +3,9 @@
 // * disable "sell" and "liquidate" buttons for users with zero payoff
 
 Meteor.subscribe('states');
-Meteor.subscribe('users');
 Meteor.subscribe('payoffByUserByState');
 Meteor.subscribe('transactions');
-
-Meteor.startup(function () {
-    // Allocate a new player id.
-    //
-    // XXX this does not handle hot reload. In the reload case,
-    // Session.get('player_id') will return a real id. We should check for
-    // a pre-existing player, and if it exists, make sure the server still
-    // knows about us.
-    var myId = Users.insert({name: "Your name", cash: 0, liquidationValue: 0, profit: 0});
-    Session.set('myId', myId);
-    console.log(Users.findOne(myId));
-});
+Meteor.subscribe('userData');
 
 Template.dpm.states = function () {
     return States.find({}, {
@@ -31,7 +19,7 @@ Template.dpm.states = function () {
 };
 
 Template.dpm.users = function () {
-    return Users.find({}, {
+    return Meteor.users.find({}, {
         sort: {profit: -1},
         transform: function (user) {
             user.cash = user.cash.toFixed(4);
@@ -43,20 +31,16 @@ Template.dpm.users = function () {
 };
 
 Template.dpm.myPayoff = function () {
-    var payoffByUserByState = PayoffByUserByState.findOne({userId: Session.get('myId'), stateId: this._id});
+    var payoffByUserByState = PayoffByUserByState.findOne({userId: Meteor.userId(), stateId: this._id});
     return payoffByUserByState ? payoffByUserByState.payoff : 0;
 };
 
 Template.dpm.events({
-    'keyup input#myname': function (evt) {
-        var name = String(evt.target.value || "");
-        Users.update(Session.get('myId'), {$set: {name: name}});
-    },
     'click input.sell': function () {
-        Meteor.call("addTransaction", Session.get('myId'), this._id, -UNIT_PAYOFF);
+        Meteor.call("addTransaction", Meteor.userId(), this._id, -UNIT_PAYOFF);
     },
     'click input.buy': function () {
-        Meteor.call("addTransaction", Session.get('myId'), this._id, UNIT_PAYOFF);
+        Meteor.call("addTransaction", Meteor.userId(), this._id, UNIT_PAYOFF);
     },
     'click input.liquidate': function () {
         Meteor.call("liquidate", this._id);

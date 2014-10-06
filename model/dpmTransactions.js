@@ -1,7 +1,7 @@
 Meteor.methods({
     /**
      * This method must be the only way to add to the Transactions collection
-     * in order to guarantee that the States and Users info remains in-sync.
+     * in order to guarantee that the States and Users0 info remains in-sync.
      * Must be global.
      *
      * @param {string} userId
@@ -11,12 +11,12 @@ Meteor.methods({
     addTransaction: function (userId, stateId, payoff) {
         var transactionId = Transactions.insert({
             timeStamp: (new Date()).toISOString(), // TODO: Make sure we get server's timestamp, not client's
-            user: Users.findOne(userId),
-            state: States.findOne(stateId),
+            user: Meteor.users.findOne(userId),  // TODO: should pass userId, not the whole object
+            state: States.findOne(stateId),  // TODO: should pass userId, not the whole object
             payoff: payoff
         });
         var transaction = Transactions.findOne(transactionId);
-        console.log("***New transaction:", transaction.timeStamp, transaction.user.name, (transaction.payoff > 0) ? "Buys" : "Sells", "<", transaction.state.name, ">");
+        console.log("***New transaction:", transaction.timeStamp, transaction.user.username, (transaction.payoff > 0) ? "Buys" : "Sells", "<", transaction.state.name, ">");
 
         var preTransactionInvestment = calcInvestment(States, LAMBDA);
         States.update(stateId, {$inc: {payoff: payoff}});
@@ -34,13 +34,13 @@ Meteor.methods({
         updateUnitPayoffPrices(States, LAMBDA, UNIT_PAYOFF);
 
         // Update the P&L for all users
-        Users.find({}).forEach(function (userIt) {
+        Meteor.users.find({}).forEach(function (userIt) {
             var payoffArraySortedByState = PayoffByUserByState.find({userId: userIt._id}, {sort: {stateId: 1}}).fetch();
-            var cash = Users.findOne(userIt._id).cash;
+            var cash = Meteor.users.findOne(userIt._id).cash;
             if (userIt._id === userId)
                 cash += preTransactionInvestment - postTransactionInvestment;
             var liquidationValue = calcLiquidationValue(payoffArraySortedByState, States, LAMBDA);
-            Users.update(userIt._id, {
+            Meteor.users.update(userIt._id, {
                 $set: {
                     cash: cash,
                     liquidationValue: liquidationValue,

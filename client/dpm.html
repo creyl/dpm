@@ -1,19 +1,6 @@
-<!-- test file sync -->
-<head>
-    <title>Dynamic Pari Mutuel</title>
-</head>
-
-<body>
-<div id="outer">
-    {{> dpm}}
-</div>
-</body>
-
 <template name="dpm">
-    <div>
-        <h1>What's your name?</h1>
-        <input id="myname" type="text" placeholder="Your Name"/>
 
+    <div>
         <table class="table"> <!-- table package from Twitter's bootstrap     -->
             <tr>
                 <th>Outcome</th>
@@ -59,7 +46,7 @@
 
 <template name="user">
     <tr>
-        <td>{{name}}</td>
+        <td>{{username}}</td>
         <td>{{cash}}</td>
         <td>{{liquidationValue}}</td>
         <td>{{profit}}</td>

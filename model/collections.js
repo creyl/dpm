@@ -7,12 +7,6 @@
 //           unitPayoffOffer: Number}
 States = new Meteor.Collection("states");
 
-// Users -- {name: String,
-//           cash: Number,
-//           liquidationValue: Number,
-//           profit: Number}
-Users = new Meteor.Collection("users");
-
 // PayoffByUserByState -- {userId: String,
 //                         stateId: String,
 //                         payoff: Number}
