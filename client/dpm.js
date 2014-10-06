@@ -4,7 +4,6 @@
 
 Meteor.subscribe('states');
 Meteor.subscribe('payoffByUserByState');
-Meteor.subscribe('transactions');
 Meteor.subscribe('userData');
 
 Template.dpm.states = function () {

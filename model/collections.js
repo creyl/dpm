@@ -1,5 +1,5 @@
 // Set up collections to contain market information. On the server,
-// it is backed by a MongoDB collection named "transactions".
+// it is backed by MongoDB collections.
 
 // States -- {name: String,
 //           payoff: Number,
@@ -13,7 +13,7 @@ States = new Meteor.Collection("states");
 PayoffByUserByState = new Meteor.Collection("payoffByUserByState");
 
 // Transactions -- {timeStamp: String, 
-//                 user: User,
-//                 state: State,
+//                 userId: String,
+//                 stateId: String,
 //                 payoff: Number}
 Transactions = new Meteor.Collection("transactions");

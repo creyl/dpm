@@ -6,10 +6,10 @@ Meteor.startup(function () {
         var stateId1 = States.insert({name: "Brazil wins", payoff: 0, unitPayoffBid: 0, unitPayoffOffer: UNIT_PAYOFF});
         var stateId2 = States.insert({name: "Brazil loses", payoff: 0, unitPayoffBid: 0, unitPayoffOffer: UNIT_PAYOFF});
 
-// Additional fields for Meteor.users -- {
-//           cash: Number,
-//           liquidationValue: Number,
-//           profit: Number}
+        // Additional fields for Meteor.users -- {
+        //           cash: Number,
+        //           liquidationValue: Number,
+        //           profit: Number}
         Meteor.users.remove({});  // REMOVE ALL USERS
         var names = [
             "Seed", "Ada Lovelace", "Grace Hopper", "Marie Curie", "Carl Friedrich Gauss",
@@ -29,5 +29,7 @@ Meteor.startup(function () {
         for (i = 1; i < nUsers; i++) {
             Meteor.call("addTransaction", userId[i % nUsers], (i % 2) === 0 ? stateId1 : stateId2, UNIT_PAYOFF * 10);
         }
-    }
+
+        Accounts.createUser({username: 'creyl', password: 'forecast', cash: 0, liquidationValue: 0, profit: 0});
+}
 );
