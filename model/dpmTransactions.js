@@ -36,6 +36,9 @@ Meteor.methods({
         // Update all unit payoff prices
         updateUnitPayoffPrices(States, LAMBDA, UNIT_PAYOFF);
 
+        if (!BalanceByUser.findOne({userId: userId}))
+            BalanceByUser.insert({userId: userId, cash: 0, liquidationValue: 0, profit: 0});
+
         // Update the P&L for all users
         BalanceByUser.find({}).forEach(function (bbu) {
             var payoffArraySortedByState = PayoffByUserByState.find({userId: bbu.userId}, {sort: {stateId: 1}}).fetch();
