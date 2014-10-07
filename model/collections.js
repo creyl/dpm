@@ -12,7 +12,13 @@ States = new Meteor.Collection("states");
 //                         payoff: Number}
 PayoffByUserByState = new Meteor.Collection("payoffByUserByState");
 
-// Transactions -- {timeStamp: String, 
+// BalanceByUser -- {userId: String,
+//                   cash: Number,
+//                   liquidationValue: Number,
+//                   profit: Number}
+BalanceByUser = new Meteor.Collection("balanceByUser");
+
+// Transactions -- {timeStamp: String,
 //                 userId: String,
 //                 stateId: String,
 //                 payoff: Number}

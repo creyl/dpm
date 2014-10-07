@@ -27,7 +27,7 @@
         </table>
     </div>
 
-    <div class="dpm">
+    <div>
         <table class="table table-condensed"> <!-- table package from Twitter's bootstrap     -->
             <tr>
                 <th>User</th>
@@ -37,14 +37,14 @@
                 <th></th>
             </tr>
             {{#each users}}
-                {{> user}}
+                {{> bbu}}
             {{/each}}
         </table>
     </div>
 
 </template>
 
-<template name="user">
+<template name="bbu">
     <tr>
         <td>{{username}}</td>
         <td>{{cash}}</td>

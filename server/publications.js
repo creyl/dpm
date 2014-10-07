@@ -10,6 +10,9 @@ Meteor.publish('payoffByUserByState', function () {
 });
 
 Meteor.publish("userData", function () {
-    return Meteor.users.find({},
-        {fields: {'username': 1, 'cash': 1, 'liquidationValue': 1, 'profit': 1}});
+    return Meteor.users.find({}, {fields: {'username': 1}});
+});
+
+Meteor.publish("balanceByUser", function () {
+    return BalanceByUser.find();
 });

@@ -5,29 +5,33 @@
 Meteor.subscribe('states');
 Meteor.subscribe('payoffByUserByState');
 Meteor.subscribe('userData');
+Meteor.subscribe('balanceByUser');
 
-Template.dpm.states = function () {
-    return States.find({}, {
-        sort: {name: +1},
-        transform: function (state) {
-            state.unitPayoffBid = state.unitPayoffBid.toFixed(4);
-            state.unitPayoffOffer = state.unitPayoffOffer.toFixed(4);
-            return state;
-        }
-    });
-};
+Template.dpm.helpers({
+    states: function () {
+        return States.find({}, {
+            sort: {name: +1},
+            transform: function (state) {
+                state.unitPayoffBid = state.unitPayoffBid.toFixed(4);
+                state.unitPayoffOffer = state.unitPayoffOffer.toFixed(4);
+                return state;
+            }
+        });
+    },
 
-Template.dpm.users = function () {
-    return Meteor.users.find({}, {
-        sort: {profit: -1},
-        transform: function (user) {
-            user.cash = user.cash.toFixed(4);
-            user.liquidationValue = user.liquidationValue.toFixed(4);
-            user.profit = user.profit.toFixed(4);
-            return user;
-        }
-    });
-};
+    users: function () {
+        return BalanceByUser.find({}, {
+            sort: {profit: -1},
+            transform: function (bbu) {
+                bbu.username = Meteor.users.findOne(bbu.userId).username;
+                bbu.cash = bbu.cash.toFixed(4);
+                bbu.liquidationValue = bbu.liquidationValue.toFixed(4);
+                bbu.profit = bbu.profit.toFixed(4);
+                return bbu;
+            }
+        });
+    }
+});
 
 Template.dpm.myPayoff = function () {
     var payoffByUserByState = PayoffByUserByState.findOne({userId: Meteor.userId(), stateId: this._id});
@@ -42,7 +46,7 @@ Template.dpm.events({
         Meteor.call("addTransaction", Meteor.userId(), this._id, UNIT_PAYOFF);
     },
     'click input.liquidate': function () {
-        Meteor.call("liquidate", this._id);
+        Meteor.call("liquidate", this._id);  // this._id is the id of the BalanceByUser
     }
 });
 
