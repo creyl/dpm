@@ -21,7 +21,6 @@ Meteor.startup(function () {
         var userId = [, , , , ,];
         for (var i = 0; i < names.length; i++) {
             userId[i] = Accounts.createUser({username: names[i]});
-            BalanceByUser.insert({userId: userId[i], cash: 0, liquidationValue: 0, profit: 0});
         }
 
         // Seed user buys uniform payoff profile
@@ -33,10 +32,7 @@ Meteor.startup(function () {
             Meteor.call("addTransaction", userId[i % nUsers], (i % 2) === 0 ? stateId1 : stateId2, UNIT_PAYOFF * 10);
         }
 
-        BalanceByUser.insert({
-            userId: Accounts.createUser({username: 'creyl', password: 'forecast'}),
-            cash: 0, liquidationValue: 0, profit: 0
-        });
+        Accounts.createUser({username: 'creyl', password: 'forecast'});
 
         console.log('There are', Meteor.users.find({}).count(), " users after startup.");
     }

@@ -30,13 +30,13 @@ Template.dpm.helpers({
                 return bbu;
             }
         });
+    },
+
+    myPayoff: function () {
+        var payoffByUserByState = PayoffByUserByState.findOne({userId: Meteor.userId(), stateId: this._id});
+        return payoffByUserByState ? payoffByUserByState.payoff : 0;
     }
 });
-
-Template.dpm.myPayoff = function () {
-    var payoffByUserByState = PayoffByUserByState.findOne({userId: Meteor.userId(), stateId: this._id});
-    return payoffByUserByState ? payoffByUserByState.payoff : 0;
-};
 
 Template.dpm.events({
     'click input.sell': function () {

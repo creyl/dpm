@@ -1,11 +1,12 @@
 <template name="dpm">
 
     <div>
-        <table class="table"> <!-- table package from Twitter's bootstrap     -->
+        <table class="table table-condensed"> <!-- table package from Twitter's bootstrap     -->
             <tr>
                 <th>Outcome</th>
                 <th>Total Payoff</th>
-                <th>Your Payoff</th>
+                {{#if currentUser}}
+                    <th>Your Payoff</th>{{/if}}
                 <th></th>
                 <th>Bid</th>
                 <th>Offer</th>
@@ -15,7 +16,8 @@
                 <tr>
                     <td>{{name}}</td>
                     <td>{{payoff}}</td>
-                    <td>{{myPayoff}}</td>
+                    {{#if currentUser}}
+                        <td>{{myPayoff}}</td>{{/if}}
                     <td>
                         {{#if myPayoff}}<input type="button" class="sell" value="Sell"/>{{/if}}
                     </td>
@@ -30,10 +32,10 @@
     <div>
         <table class="table table-condensed"> <!-- table package from Twitter's bootstrap     -->
             <tr>
-                <th>User</th>
+                <th>Participant</th>
+                <th>P&L</th>
                 <th>Cash</th>
                 <th>Liquidation Value</th>
-                <th>P&L</th>
                 <th></th>
             </tr>
             {{#each users}}
@@ -41,16 +43,18 @@
             {{/each}}
         </table>
     </div>
-
 </template>
 
 <template name="bbu">
     <tr>
         <td>{{username}}</td>
+        <td>{{profit}}</td>
         <td>{{cash}}</td>
         <td>{{liquidationValue}}</td>
-        <td>{{profit}}</td>
-        <td><input type="button" class="liquidate" value="Liquidate"/></td>
+        <td>
+            {{#if currentUser}}
+                <input type="button" class="liquidate" value="Liquidate"/>
+            {{/if}}
+        </td>
     </tr>
 </template>
-
