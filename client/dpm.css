@@ -44,21 +44,3 @@ body {
     color: #777;
 }
 
-.sell {
-    cursor: pointer;
-    background-color: #3366FF;
-    color: #FFFFFF;
-}
-
-.buy {
-    cursor: pointer;
-    background-color: #FF6600;
-    color: #FFFFFF;
-}
-
-.liquidate {
-    cursor: pointer;
-    background-color: #3366FF;
-    color: #FFFFFF;
-}
-

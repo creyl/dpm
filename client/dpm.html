@@ -19,11 +19,21 @@
                     {{#if currentUser}}
                         <td>{{myPayoff}}</td>{{/if}}
                     <td>
-                        {{#if myPayoff}}<input type="button" class="sell" value="Sell"/>{{/if}}
+                        {{#if myPayoff}}
+                            <input type="button" class="sell btn btn-mini btn-primary" value="Sell"/>
+                        {{else}}
+                            <input type="button" class="disabled btn btn-mini btn-primary" value="Sell"/>
+                        {{/if}}
                     </td>
                     <td>{{unitPayoffBid}}</td>
                     <td>{{unitPayoffOffer}}</td>
-                    <td><input type="button" class="buy" value="Buy"/></td>
+                    <td>
+                        {{#if currentUser}}
+                            <input type="button" class="buy btn btn-mini btn-warning" value="Buy"/>
+                        {{else}}
+                            <input type="button" class="disabled btn btn-mini btn-warning" value="Buy"/>
+                        {{/if}}
+                    </td>
                 </tr>
             {{/each}}
         </table>
@@ -53,7 +63,7 @@
         <td>{{liquidationValue}}</td>
         <td>
             {{#if currentUser}}
-                <input type="button" class="liquidate" value="Liquidate"/>
+                <input type="button" class="liquidate btn btn-mini btn-primary" value="Liquidate"/>
             {{/if}}
         </td>
     </tr>

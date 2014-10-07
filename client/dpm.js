@@ -1,6 +1,4 @@
-// TODO:
-// * implement seeding of DPM
-// * disable "sell" and "liquidate" buttons for users with zero payoff
+// TODO: Clicking on 'buy' button when not logged in prompts the user to log in
 
 Meteor.subscribe('states');
 Meteor.subscribe('payoffByUserByState');
@@ -40,13 +38,16 @@ Template.dpm.helpers({
 
 Template.dpm.events({
     'click input.sell': function () {
-        Meteor.call("addTransaction", Meteor.userId(), this._id, -UNIT_PAYOFF);
+        if (Meteor.user())
+            Meteor.call("addTransaction", Meteor.userId(), this._id, -UNIT_PAYOFF);
     },
     'click input.buy': function () {
-        Meteor.call("addTransaction", Meteor.userId(), this._id, UNIT_PAYOFF);
+        if (Meteor.user())
+            Meteor.call("addTransaction", Meteor.userId(), this._id, UNIT_PAYOFF);
     },
     'click input.liquidate': function () {
-        Meteor.call("liquidate", this._id);  // this._id is the id of the BalanceByUser
+        if (Meteor.user())
+            Meteor.call("liquidate", this._id);  // this._id is the id of the BalanceByUser
     }
 });
 
