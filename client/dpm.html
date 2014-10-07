@@ -1,12 +1,13 @@
 <template name="dpm">
 
     <div>
-        <table class="table table-condensed"> <!-- table package from Twitter's bootstrap     -->
+        <table class="table table-condensed">
+            <caption>INFORMATION TRADING</caption>
             <tr>
                 <th>Outcome</th>
-                <th>Total Payoff</th>
+                <th>Open Interest</th>
                 {{#if currentUser}}
-                    <th>Your Payoff</th>{{/if}}
+                    <th>Your Interest</th>{{/if}}
                 <th></th>
                 <th>Bid</th>
                 <th>Offer</th>
@@ -40,7 +41,8 @@
     </div>
 
     <div>
-        <table class="table table-condensed"> <!-- table package from Twitter's bootstrap     -->
+        <table class="table table-condensed table">
+            <caption>TOP PARTICIPANTS</caption>
             <tr>
                 <th>Participant</th>
                 <th>P&L</th>

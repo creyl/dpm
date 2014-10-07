@@ -1,4 +1,4 @@
-// TODO: Clicking on 'buy' button when not logged in prompts the user to log in
+// TODO: Show chart of price and open interest
 
 Meteor.subscribe('states');
 Meteor.subscribe('payoffByUserByState');
