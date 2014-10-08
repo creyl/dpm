@@ -1,16 +1,18 @@
-<template name="dpm">
-
+<template name="tradeView">
     <div>
         <table class="table table-condensed">
             <caption>INFORMATION TRADING</caption>
             <tr>
                 <th>Outcome</th>
-                <th>Open Interest</th>
+                <th><abbr title="Total number of $1-payoff contracts that have been bought but not sold yet">Open
+                    Interest</abbr></th>
                 {{#if currentUser}}
-                    <th>Your Interest</th>{{/if}}
+                    <th><abbr title="Total number of $1-payoff contracts you have bought but not sold yet">Your
+                        Interest</abbr></th>
+                {{/if}}
                 <th></th>
-                <th>Bid</th>
-                <th>Offer</th>
+                <th><abbr title="Price at which a $1-payoff contract can be sold now">Bid</abbr></th>
+                <th><abbr title="Price at which a $1-payoff contract can be bought now">Offer</abbr></th>
                 <th></th>
             </tr>
             {{#each states}}
@@ -39,34 +41,4 @@
             {{/each}}
         </table>
     </div>
-
-    <div>
-        <table class="table table-condensed table">
-            <caption>TOP PARTICIPANTS</caption>
-            <tr>
-                <th>Participant</th>
-                <th>P&L</th>
-                <th>Cash</th>
-                <th>Liquidation Value</th>
-                <th></th>
-            </tr>
-            {{#each users}}
-                {{> bbu}}
-            {{/each}}
-        </table>
-    </div>
-</template>
-
-<template name="bbu">
-    <tr>
-        <td>{{username}}</td>
-        <td>{{profit}}</td>
-        <td>{{cash}}</td>
-        <td>{{liquidationValue}}</td>
-        <td>
-            {{#if currentUser}}
-                <input type="button" class="liquidate btn btn-mini btn-primary" value="Liquidate"/>
-            {{/if}}
-        </td>
-    </tr>
 </template>

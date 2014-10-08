@@ -1,0 +1,36 @@
+<template name="leaderboard">
+    <div>
+        <table class="table table-condensed">
+            <caption>TOP 10 LEADERBOARD</caption>
+            <tr>
+                <th>Participant</th>
+                <th><abbr title="Profit & Loss: Sum of the Cash and Liquidation Value">P&L</abbr></th>
+                <th><abbr title="Balance of virtual money">Cash</abbr></th>
+                <th><abbr title="Virtual money you would get if you sold every $1-payoff contract now">Liquidation
+                    Value</abbr></th>
+                <th></th>
+            </tr>
+            <tbody>
+            {{#each topParticipants}}
+                {{#if isCurrentUser}}
+                    <tr class="info">{{> bbu}}</tr>
+                {{else}}
+                    <tr>{{> bbu}}</tr>
+                {{/if}}
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+</template>
+
+<template name="bbu">
+    <td>{{username}}</td>
+    <td>{{profit}}</td>
+    <td>{{cash}}</td>
+    <td>{{liquidationValue}}</td>
+    <td>
+        {{#if currentUser}}
+            <input type="button" class="liquidate btn btn-mini btn-primary" value="Liquidate"/>
+        {{/if}}
+    </td>
+</template>
