@@ -1,7 +1,7 @@
 Meteor.methods({
     /**
      * This method must be the only way to add to the Transactions collection
-     * in order to guarantee that the States and Users0 info remains in-sync.
+     * in order to guarantee that the States and Users info remains in-sync.
      * Must be global.
      *
      * @param {string} userId
@@ -9,8 +9,9 @@ Meteor.methods({
      * @param {number} payoff - A positive or negative number
      */
     addTransaction: function (userId, stateId, payoff) {
+        var timeStamp = (new Date()).toISOString();
         var transactionId = Transactions.insert({
-            timeStamp: (new Date()).toISOString(), // TODO: Make sure we get server's timestamp, not client's
+            timeStamp: timeStamp, // Should be server's timestamp, not client's
             user: userId,
             state: stateId,
             payoff: payoff
@@ -25,11 +26,20 @@ Meteor.methods({
         States.update(stateId, {$inc: {payoff: payoff}});
         var postTransactionInvestment = calcInvestment(States, LAMBDA);
 
+        var paoihId = PriceAndOpenInterestHistory.insert({
+            stateId: stateId,
+            timeStamp: timeStamp,
+            openInterest: States.findOne(stateId).payoff,
+            lastPrice: (payoff < 0) ? States.findOne(stateId).unitPayoffBid : States.findOne(stateId).unitPayoffOffer
+        });
+        console.log("PriceAndOpenInterestHistory: ", PriceAndOpenInterestHistory.findOne(paoihId));
+
         var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
+        var payoffId;
         if (payoffCursor.count() === 0)
-            PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
+            payoffId = PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
         else {
-            var payoffId = payoffCursor.fetch()[0]._id;
+            payoffId = payoffCursor.fetch()[0]._id;
             PayoffByUserByState.update(payoffId, {$inc: {payoff: payoff}});
         }
 
@@ -59,7 +69,7 @@ Meteor.methods({
     /**
      * This function liquidates a user's position.
      * Must be global.
-     * @param {string} balanceByUserId
+     * @param {string} bbuId
      */
     liquidate: function (bbuId) {
         var userId = BalanceByUser.findOne(bbuId).userId;
@@ -71,7 +81,12 @@ Meteor.methods({
     }
 });
 
-// This function returns the required investment for the entire DPM //
+/**
+ * This function returns the required investment for the entire DPM
+ * @param {Mongo.Collection} states
+ * @param {number} lambda
+ * @returns {number}
+ */
 var calcInvestment = function (states, lambda) {
     var investment = 0;
     states.find({}).forEach(function (state) {
@@ -81,7 +96,13 @@ var calcInvestment = function (states, lambda) {
     return investment;
 };
 
-// This functions returns the liquidation value for a user's aggregate payoff profile
+/**
+ * This functions returns the liquidation value for a user's aggregate payoff profile
+ * @param payoffArraySortedByState
+ * @param {Mongo.Collection} states
+ * @param {number} lambda
+ * @returns {number}
+ */
 var calcLiquidationValue = function (payoffArraySortedByState, states, lambda) {
     var investment0 = 0, investment1 = 0;
     var userPayoff;
@@ -102,7 +123,12 @@ var calcLiquidationValue = function (payoffArraySortedByState, states, lambda) {
     return (investment0 - investment1);
 };
 
-// This function updates the unit payoff prices for each state
+/**
+ * This function updates the unit payoff prices for each state.
+ * @param {Mongo.Collection} states
+ * @param {number} lambda
+ * @param {number} unitPayoff
+ */
 var updateUnitPayoffPrices = function (states, lambda, unitPayoff) {
     var investment0 = calcInvestment(states, lambda);
 
@@ -120,4 +146,3 @@ var updateUnitPayoffPrices = function (states, lambda, unitPayoff) {
         states.update(stateA._id, {$set: {unitPayoffBid: -investment2 + investment0}});
     });
 };
-
