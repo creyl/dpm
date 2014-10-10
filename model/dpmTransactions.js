@@ -26,20 +26,18 @@ Meteor.methods({
         States.update(stateId, {$inc: {payoff: payoff}});
         var postTransactionInvestment = calcInvestment(States, LAMBDA);
 
-        var paoihId = PriceAndOpenInterestHistory.insert({
+        PriceAndOpenInterestHistory.insert({
             stateId: stateId,
             timeStamp: timeStamp,
             openInterest: States.findOne(stateId).payoff,
             lastPrice: (payoff < 0) ? States.findOne(stateId).unitPayoffBid : States.findOne(stateId).unitPayoffOffer
         });
-        console.log("PriceAndOpenInterestHistory: ", PriceAndOpenInterestHistory.findOne(paoihId));
 
         var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
-        var payoffId;
         if (payoffCursor.count() === 0)
-            payoffId = PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
+            PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
         else {
-            payoffId = payoffCursor.fetch()[0]._id;
+            var payoffId = payoffCursor.fetch()[0]._id;
             PayoffByUserByState.update(payoffId, {$inc: {payoff: payoff}});
         }
 
