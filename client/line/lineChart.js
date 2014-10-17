@@ -1,39 +1,11 @@
-var Points = new Meteor.Collection(null);
-
-if (Points.find({}).count() === 0) {
-    for (i = 0; i < 50; i++)
-        Points.insert({
-            date: new Date(1971 + i, 4, 24),
-            value: Math.floor(Math.random() * 10) + 500
-        });
-}
-
-Template.lineChart.events({
-    'click #add': function () {
-        Points.insert({
-            date: new Date(1971 + i, 4, 24),
-            value: Math.floor(Math.random() * 100) + 500
-        });
-    },
-    'click #remove': function () {
-        var toRemove = Random.choice(Points.find().fetch());
-        Points.remove({_id: toRemove._id});
-    },
-    'click #randomize': function () {
-        //loop through bars
-        Points.find({}).forEach(function (point) {
-            Points.update({_id: point._id}, {$set: {value: Math.floor(Math.random() * 100) + 500}});
-        });
-    }
-});
 
 Template.lineChart.rendered = function () {
     //Width and height
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = 600 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+        height = 200 - margin.top - margin.bottom;
 
-    var x = d3.time.scale()
+    var x = d3.scale.linear()
         .range([0, width]);
 
     var y = d3.scale.linear()
@@ -49,11 +21,14 @@ Template.lineChart.rendered = function () {
 
     var line = d3.svg.line()
         .x(function (d) {
-            return x(d.date);
+            return x(d.index);
         })
         .y(function (d) {
-            return y(d.value);
+            return y(d.lastPrice);
         });
+
+    var color = d3.scale.ordinal()
+        .range(["#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2"]);
 
     var svg = d3.select("#lineChart")
         .attr("width", width + margin.left + margin.right)
@@ -63,53 +38,114 @@ Template.lineChart.rendered = function () {
 
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")");
+        .attr("transform", "translate(0," + height + ")")
+        .append("text")
+        .attr("x", width)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text("Last 100 transactions");
 
     svg.append("g")
         .attr("class", "y axis")
+        .call(yAxis)
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .text("Price ($)");
+        .text("Price");
+
+    var stateCursor = States.find(); // Not expected to change throughout life of market
+    function getLast100History() {
+        return stateCursor.map(function (state) {
+            return {
+                name: state.name,
+                values: PriceAndOpenInterestHistory.find(
+                    {stateId: state._id},
+                    {fields: {index: 1, lastPrice: 1}, sort: {index: -1}, limit: 100}
+                ).fetch()
+            }
+        });
+    }
+
+    y.domain([0, 1]);
 
     Deps.autorun(function () {
-        var dataset = Points.find({}, {sort: {date: -1}}).fetch();
+        var stateNames = States.find({}, {fields: {name: 1}}).map(function (s) {
+            return s.name;
+        });
+        console.log("stateNames ", stateNames);
+        color.domain(stateNames);
+
+        var dataset = getLast100History();
+        console.log("dataset", dataset);
 
         var paths = svg.selectAll("path.line")
-            .data([dataset]); //todo - odd syntax here - should use a key function, but can't seem to get that working
+            .data(dataset);
 
-        x.domain(d3.extent(dataset, function (d) {
-            return d.date;
-        }));
-        y.domain(d3.extent(dataset, function (d) {
-            return d.value;
-        }));
+        x.domain([
+            d3.min(dataset, function (c) {
+                return d3.min(c.values, function (d) {
+                    return d.index;
+                });
+            }),
+            d3.max(dataset, function (c) {
+                return d3.max(c.values, function (d) {
+                    return d.index;
+                });
+            })
+        ]);
 
         //Update X axis
         svg.select(".x.axis")
             .transition()
-            .duration(1000)
+            .duration(500)
             .call(xAxis);
-
-        //Update Y axis
-        svg.select(".y.axis")
-            .transition()
-            .duration(1000)
-            .call(yAxis);
 
         paths
             .enter()
+            .append("g")
             .append("path")
             .attr("class", "line")
-            .attr('d', line);
+            .attr('d', function (d) {
+                return line(d.values);
+            })
+            .style("stroke", function (d) {
+                return color(d.name);
+            });
 
         paths
-            .attr('d', line); //todo - should be a transition, but removed it due to absence of key
+            .attr('d', function (d) {
+                return line(d.values);
+            });
 
         paths
             .exit()
             .remove();
+
+        var legend = svg.selectAll(".legend")
+            .data(stateNames.slice())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) {
+                return "translate(15," + i * 20 + ")";
+            });
+
+        legend.append("rect")
+            .attr("x", width - 10)
+            .attr("width", 10)
+            .attr("height", 10)
+            .style("fill", color);
+
+        legend.append("text")
+            .attr("x", width - 12)
+            .attr("y", 6)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function (d) {
+                return d;
+            });
+
     });
+
 };

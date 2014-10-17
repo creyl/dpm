@@ -9,7 +9,11 @@ Meteor.methods({
      * @param {number} payoff - A positive or negative number
      */
     addTransaction: function (userId, stateId, payoff) {
-        var timeStamp = (new Date()).toISOString();
+        check(userId, String);
+        check(stateId, String);
+        check(payoff, Number);
+
+        var timeStamp = new Date();
         var transactionId = Transactions.insert({
             timeStamp: timeStamp, // Should be server's timestamp, not client's
             user: userId,
@@ -26,8 +30,10 @@ Meteor.methods({
         States.update(stateId, {$inc: {payoff: payoff}});
         var postTransactionInvestment = calcInvestment(States, LAMBDA);
 
+        var paoihIndex = PriceAndOpenInterestHistory.find().count();
         PriceAndOpenInterestHistory.insert({
             stateId: stateId,
+            index: paoihIndex + 1,
             timeStamp: timeStamp,
             openInterest: States.findOne(stateId).payoff,
             lastPrice: (payoff < 0) ? States.findOne(stateId).unitPayoffBid : States.findOne(stateId).unitPayoffOffer
@@ -70,6 +76,8 @@ Meteor.methods({
      * @param {string} bbuId
      */
     liquidate: function (bbuId) {
+        check(bbuId, String);
+
         var userId = BalanceByUser.findOne(bbuId).userId;
         PayoffByUserByState.find({userId: userId}).forEach(
             function (pbubs) {

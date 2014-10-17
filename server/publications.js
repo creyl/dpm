@@ -16,3 +16,7 @@ Meteor.publish("userData", function () {
 Meteor.publish("balanceByUser", function () {
     return BalanceByUser.find();
 });
+
+Meteor.publish("priceAndOpenInterestHistory", function () {
+    return PriceAndOpenInterestHistory.find();
+});

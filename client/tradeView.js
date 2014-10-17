@@ -1,12 +1,3 @@
-// TODO: Limit virtual cash to -10
-// TODO: Show chart of price and open interest
-// TODO: Link to invite your friends
-
-Meteor.subscribe('states');
-Meteor.subscribe('payoffByUserByState');
-Meteor.subscribe('userData');
-Meteor.subscribe('balanceByUser');
-
 Template.tradeView.helpers({
     states: function () {
         return States.find({}, {

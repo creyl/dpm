@@ -34,7 +34,7 @@ BalanceByUser = new Meteor.Collection("balanceByUser");
 
 /**
  * Contains all transactions by user by state
- * {string} timeStamp
+ * {Date} timeStamp
  * {string} userId
  * {string} stateId
  * {number} payoff
@@ -46,7 +46,8 @@ Transactions = new Meteor.Collection("transactions");
 /**
  * History of price and open interest for each state
  * {string} stateId
- * {string} timeStamp
+ * {number} index
+ * {Date} timeStamp
  * {number} lastPrice
  * {number} openInterest The sum of all outstanding payoff on that state
  *
