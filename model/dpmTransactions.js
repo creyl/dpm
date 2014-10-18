@@ -13,6 +13,14 @@ Meteor.methods({
         check(stateId, String);
         check(payoff, Number);
 
+        var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
+        if (((payoffCursor.count() === 0) && (payoff < 0)) ||
+            (payoff + payoffCursor.fetch().payoff < 0)) {
+            console.log("TRANSACTION REJECTED: Transaction would cause user ", Meteor.users.findOne(userId).username,
+                " to have a negative open interest.");
+            return;
+        }
+
         var timeStamp = new Date();
         var transactionId = Transactions.insert({
             timeStamp: timeStamp, // Should be server's timestamp, not client's
@@ -39,7 +47,6 @@ Meteor.methods({
             lastPrice: (payoff < 0) ? States.findOne(stateId).unitPayoffBid : States.findOne(stateId).unitPayoffOffer
         });
 
-        var payoffCursor = PayoffByUserByState.find({userId: userId, stateId: stateId});
         if (payoffCursor.count() === 0)
             PayoffByUserByState.insert({userId: userId, stateId: stateId, payoff: payoff});
         else {

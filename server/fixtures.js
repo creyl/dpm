@@ -29,7 +29,8 @@ Meteor.startup(function () {
             Meteor.call("addTransaction",
                 userId[i % nUsers],
                 (i % 2) === 0 ? stateId1 : stateId2,
-                UNIT_PAYOFF * Math.floor(20 * (Math.random() - 0.5)));
+                UNIT_PAYOFF * Math.ceil(3 * Math.random()) * (Math.random() < 0.25 ? -1 : 1) // skewed towards buys
+            );
         }
 
         Accounts.createUser({username: 'creyl', password: 'forecast'});
