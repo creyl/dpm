@@ -35,3 +35,29 @@ States.updateUnitPayoffPrices = function (lambda, unitPayoff) {
         states.update(stateA._id, {$set: {unitPayoffBid: -investment2 + investment0}});
     });
 };
+
+/**
+ * This method returns the liquidation value for a user's aggregate payoff profile.
+ * @param {Object} payoffArraySortedByState
+ * @param {number} lambda
+ * @returns {number}
+ */
+States.calcLiquidationValue = function (payoffArraySortedByState, lambda) {
+    var investment0 = 0, investment1 = 0;
+    var userPayoff;
+    var i = 0;
+    this.find({}, {sort: {_id: 1}}).forEach(function (state) {
+        if (payoffArraySortedByState[i] && payoffArraySortedByState[i].stateId === state._id) {
+            userPayoff = payoffArraySortedByState[i].payoff;
+            i++;
+        }
+        else {
+            userPayoff = 0;
+        }
+        investment0 += Math.pow(state.payoff, lambda);
+        investment1 += Math.pow(state.payoff - userPayoff, lambda);
+    });
+    investment0 = Math.pow(investment0, 1.0 / lambda);
+    investment1 = Math.pow(investment1, 1.0 / lambda);
+    return (investment0 - investment1);
+};

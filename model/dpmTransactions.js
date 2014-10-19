@@ -66,7 +66,7 @@ Meteor.methods({
             var cash = bbu.cash;
             if (bbu.userId === userId)
                 cash += preTransactionInvestment - postTransactionInvestment;
-            var liquidationValue = calcLiquidationValue(payoffArraySortedByState, States, LAMBDA);
+            var liquidationValue = States.calcLiquidationValue(payoffArraySortedByState, LAMBDA);
             BalanceByUser.update(bbu._id, {
                 $set: {
                     cash: cash,
@@ -93,30 +93,3 @@ Meteor.methods({
         );
     }
 });
-
-/**
- * This functions returns the liquidation value for a user's aggregate payoff profile
- * @param payoffArraySortedByState
- * @param {Mongo.Collection} states
- * @param {number} lambda
- * @returns {number}
- */
-var calcLiquidationValue = function (payoffArraySortedByState, states, lambda) {
-    var investment0 = 0, investment1 = 0;
-    var userPayoff;
-    var i = 0;
-    states.find({}, {sort: {_id: 1}}).forEach(function (state) {
-        if (payoffArraySortedByState[i] && payoffArraySortedByState[i].stateId === state._id) {
-            userPayoff = payoffArraySortedByState[i].payoff;
-            i++;
-        }
-        else {
-            userPayoff = 0;
-        }
-        investment0 += Math.pow(state.payoff, lambda);
-        investment1 += Math.pow(state.payoff - userPayoff, lambda);
-    });
-    investment0 = Math.pow(investment0, 1.0 / lambda);
-    investment1 = Math.pow(investment1, 1.0 / lambda);
-    return (investment0 - investment1);
-};
