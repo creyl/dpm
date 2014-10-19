@@ -18,7 +18,7 @@ Meteor.methods({
             (payoff + payoffCursor.fetch().payoff < 0)) {
             console.log("TRANSACTION REJECTED: Transaction would cause user ", Meteor.users.findOne(userId).username,
                 " to have a negative open interest.");
-            return;
+            return; // TODO: Throw error
         }
 
         var timeStamp = new Date();
@@ -34,9 +34,9 @@ Meteor.methods({
             (transaction.payoff > 0) ? "Buys" : "Sells",
             "<", States.findOne(stateId).name, ">");
 
-        var preTransactionInvestment = calcInvestment(States, LAMBDA);
+        var preTransactionInvestment = States.calcInvestment(LAMBDA);
         States.update(stateId, {$inc: {payoff: payoff}});
-        var postTransactionInvestment = calcInvestment(States, LAMBDA);
+        var postTransactionInvestment = States.calcInvestment(LAMBDA);
 
         var paoihIndex = PriceAndOpenInterestHistory.find().count();
         PriceAndOpenInterestHistory.insert({
@@ -55,7 +55,7 @@ Meteor.methods({
         }
 
         // Update all unit payoff prices
-        updateUnitPayoffPrices(States, LAMBDA, UNIT_PAYOFF);
+        States.updateUnitPayoffPrices(LAMBDA, UNIT_PAYOFF);
 
         if (!BalanceByUser.findOne({userId: userId}))
             BalanceByUser.insert({userId: userId, cash: 0, liquidationValue: 0, profit: 0});
@@ -95,21 +95,6 @@ Meteor.methods({
 });
 
 /**
- * This function returns the required investment for the entire DPM
- * @param {Mongo.Collection} states
- * @param {number} lambda
- * @returns {number}
- */
-var calcInvestment = function (states, lambda) {
-    var investment = 0;
-    states.find({}).forEach(function (state) {
-        investment += Math.pow(state.payoff, lambda);
-    });
-    investment = Math.pow(investment, 1.0 / lambda);
-    return investment;
-};
-
-/**
  * This functions returns the liquidation value for a user's aggregate payoff profile
  * @param payoffArraySortedByState
  * @param {Mongo.Collection} states
@@ -134,28 +119,4 @@ var calcLiquidationValue = function (payoffArraySortedByState, states, lambda) {
     investment0 = Math.pow(investment0, 1.0 / lambda);
     investment1 = Math.pow(investment1, 1.0 / lambda);
     return (investment0 - investment1);
-};
-
-/**
- * This function updates the unit payoff prices for each state.
- * @param {Mongo.Collection} states
- * @param {number} lambda
- * @param {number} unitPayoff
- */
-var updateUnitPayoffPrices = function (states, lambda, unitPayoff) {
-    var investment0 = calcInvestment(states, lambda);
-
-    var investment1, investment2;
-    states.find({}).forEach(function (stateA) {
-        investment1 = 0;
-        investment2 = 0;
-        states.find({}).forEach(function (stateB) {
-            investment1 += Math.pow(stateB.payoff + (stateA._id === stateB._id ? unitPayoff : 0), lambda);
-            investment2 += Math.pow(stateB.payoff + (stateA._id === stateB._id ? -unitPayoff : 0), lambda);
-        });
-        investment1 = Math.pow(investment1, 1.0 / lambda);
-        investment2 = Math.pow(investment2, 1.0 / lambda);
-        states.update(stateA._id, {$set: {unitPayoffOffer: investment1 - investment0}});
-        states.update(stateA._id, {$set: {unitPayoffBid: -investment2 + investment0}});
-    });
 };
