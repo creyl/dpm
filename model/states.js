@@ -2,6 +2,18 @@
  * Created by creyl on 10/19/14.
  */
 /**
+ * Contains the states describing all possible outcomes for a given market.
+ * Each item in the collection contains the following fields:
+ * {string} name Description of state
+ * {number} payoff Open interest for that state
+ * {number} unitPayoffBid Bid price for a $1-contract
+ * {number} unitPayoffOffer Offer price for a $1-contract
+ *
+ * @type {Mongo.Collection}
+ */
+States = new Meteor.Collection("states");
+
+/**
  * This method returns the required investment for the entire DPM.
  * @param {number} lambda
  * @returns {number}
