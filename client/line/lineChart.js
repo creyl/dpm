@@ -55,30 +55,16 @@ Template.lineChart.rendered = function () {
         .style("text-anchor", "end")
         .text("Price");
 
-    var stateCursor = States.find(); // Not expected to change throughout life of market
-    function getLast100History() {
-        return stateCursor.map(function (state) {
-            return {
-                name: state.name,
-                values: PriceAndOpenInterestHistory.find(
-                    {stateId: state._id},
-                    {fields: {index: 1, lastPrice: 1}, sort: {index: -1}, limit: 100}
-                ).fetch()
-            }
-        });
-    }
-
     y.domain([0, 1]);
 
     Deps.autorun(function () {
         var stateNames = States.find({}, {fields: {name: 1}}).map(function (s) {
             return s.name;
         });
-        console.log("stateNames ", stateNames);
         color.domain(stateNames);
 
-        var dataset = getLast100History();
-        console.log("dataset", dataset);
+        var dataset = PriceAndOpenInterestHistory.getLast100History();
+        //console.log("dataset", dataset);
 
         var paths = svg.selectAll("path.line")
             .data(dataset);

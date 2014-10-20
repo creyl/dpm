@@ -29,3 +29,35 @@ PriceAndOpenInterestHistory.addNewEntry = function (stateId, timeStamp, payoff) 
         lastPrice: (payoff < 0) ? States.findOne(stateId).unitPayoffBid : States.findOne(stateId).unitPayoffOffer
     });
 };
+
+/**
+ * Returns an array of the last 100 last prices for each state for charting purposes:
+ * [{name: state0, values:
+ *      [{index: 1, lastPrice: 0.1},
+ *       {index: 3, lastPrice: 0.3},
+ *       {index: 5, lastPrice: 0.4},
+ *       ...
+ *      ]},
+ *  {name: state1, values:
+ *      [{index: 0, lastPrice: 0.9},
+ *       {index: 2, lastPrice: 0.7},
+ *       {index: 4, lastPrice: 0.6},
+ *       ...
+ *      ]},
+ *   ...
+ *  ]
+ * @returns {Array}
+ */
+PriceAndOpenInterestHistory.getLast100History = function () {
+    var that = this;
+    var stateCursor = States.find(); // Not expected to change throughout life of market
+    return stateCursor.map(function (state) {
+        return {
+            name: state.name,
+            values: that.find(
+                {stateId: state._id},
+                {fields: {index: 1, lastPrice: 1}, sort: {index: -1}, limit: 100}
+            ).fetch()
+        }
+    });
+};

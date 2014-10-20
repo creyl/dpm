@@ -31,7 +31,7 @@ BalanceByUser.updatePnL = function (userId, preTransactionInvestment, postTransa
         if (bbu.userId === userId)
             cash += preTransactionInvestment - postTransactionInvestment;
 
-        var liquidationValue = States.calcLiquidationValue(payoffArraySortedByState, LAMBDA);
+        var liquidationValue = States.calcLiquidationValue(payoffArraySortedByState);
 
         bbuCollection.update(bbu._id, {
             $set: {

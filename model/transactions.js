@@ -39,13 +39,13 @@ Meteor.methods({
         });
         Transactions.logTransaction(transactionId);
 
-        var preTransactionInvestment = States.calcInvestment(LAMBDA);
+        var preTransactionInvestment = States.calcInvestment();
         States.update(stateId, {$inc: {payoff: payoff}});
-        var postTransactionInvestment = States.calcInvestment(LAMBDA);
+        var postTransactionInvestment = States.calcInvestment();
 
         PriceAndOpenInterestHistory.addNewEntry(stateId, timeStamp, payoff);
         PayoffByUserByState.updateUserPayoff(userId, stateId, payoff);
-        States.updateUnitPayoffPrices(LAMBDA, UNIT_PAYOFF);
+        States.updateUnitPayoffPrices(UNIT_PAYOFF);
         BalanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);
     },
 
