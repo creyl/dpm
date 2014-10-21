@@ -6,7 +6,7 @@ Meteor.startup(function () {
         Meteor.users.remove({});  // REMOVE ALL USERS
         balanceByUser.remove();
         payoffByUserByState.remove();
-        Transactions.remove({});
+        transactions.remove();
         priceAndOpenInterestHistory.remove();
 
         var stateId1 = states.insert("Brazil wins", 0, 0, UNIT_PAYOFF);

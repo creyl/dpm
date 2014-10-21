@@ -1,13 +1,59 @@
 /**
- * Contains all transactions by user by state
- * {Date} timeStamp
- * {string} userId
- * {string} stateId
- * {number} payoff
  *
- * @type {Mongo.Collection}
+ * @type {Transactions}
  */
-Transactions = new Meteor.Collection("transactions");
+transactions = new Transactions();
+
+/**
+ *
+ * @constructor
+ */
+function Transactions() {
+    /**
+     * Contains all transactions by user by state
+     * {Date} timeStamp
+     * {string} userId
+     * {string} stateId
+     * {number} payoff
+     * Private
+     * @type {Mongo.Collection}
+     */
+    var TransactionsCollection = new Mongo.Collection("transactions");
+
+    /**
+     * Inserts new transaction.
+     * @param {Date} timeStamp
+     * @param {string} userId
+     * @param {string} stateId
+     * @param {number} payoff
+     * @returns {string} transactionId
+     */
+    this.insertTransaction = function (timeStamp, userId, stateId, payoff) {
+        return TransactionsCollection.insert({
+            timeStamp: timeStamp, // Should be server's timestamp, not client's
+            userId: userId,
+            stateId: stateId,
+            payoff: payoff
+        });
+    };
+
+    this.remove = function () {
+        TransactionsCollection.remove({});
+    };
+
+    /**
+     * Logs the description of a given transaction on the console
+     * @param {string} transactionId
+     */
+    this.logTransaction = function (transactionId) {
+        var transaction = TransactionsCollection.findOne(transactionId);
+
+        console.log(Meteor.users.findOne(transaction.userId).username,
+            (transaction.payoff > 0) ? "buys" : "sells",
+            "<", states.getName(transaction.stateId), ">",
+            transaction.payoff, "times.");
+    };
+}
 
 Meteor.methods({
     /**
@@ -18,6 +64,7 @@ Meteor.methods({
      * @param {string} userId
      * @param {string} stateId
      * @param {number} payoff - A positive or negative number
+     * @returns {string} transactionId
      */
     addTransaction: function (userId, stateId, payoff) {
         check(userId, String);
@@ -27,17 +74,12 @@ Meteor.methods({
         if (payoffByUserByState.isTransactionInvalid(userId, stateId, payoff)) {
             console.log("TRANSACTION REJECTED: Transaction would cause user", Meteor.users.findOne(userId).username,
                 "to have a negative open interest with incremental payoff", payoff);
-            return; // TODO: Throw error
+            return null; // TODO: Throw error
         }
 
         var timeStamp = new Date();
-        var transactionId = Transactions.insert({
-            timeStamp: timeStamp, // Should be server's timestamp, not client's
-            userId: userId,
-            stateId: stateId,
-            payoff: payoff
-        });
-        Transactions.logTransaction(transactionId);
+        var transactionId = transactions.insertTransaction(timeStamp, userId, stateId, payoff);
+        transactions.logTransaction(transactionId);
 
         var preTransactionInvestment = states.calcInvestment();
         states.updatePayoff(stateId, payoff);
@@ -47,6 +89,8 @@ Meteor.methods({
         payoffByUserByState.updateUserPayoff(userId, stateId, payoff);
         states.updateUnitPayoffPrices(UNIT_PAYOFF);
         balanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);
+
+        return transactionId;
     },
 
     /**
@@ -64,16 +108,3 @@ Meteor.methods({
         );
     }
 });
-
-/**
- * Logs the description of a given transaction on the console
- * @param {string} transactionId
- */
-Transactions.logTransaction = function (transactionId) {
-    var transaction = this.findOne(transactionId);
-
-    console.log(Meteor.users.findOne(transaction.userId).username,
-        (transaction.payoff > 0) ? "buys" : "sells",
-        "<", states.getName(transaction.stateId), ">",
-        transaction.payoff, "times.");
-};
