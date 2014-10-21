@@ -2,7 +2,6 @@
  * Created by creyl on 10/10/14.
  */
 // TODO: Throw errors
-// TODO: Limit virtual cash to -10
 // TODO: Make sure that liquidate triggers chart refresh
 // TODO: Implement test suite
 // TODO: Link to invite your friends

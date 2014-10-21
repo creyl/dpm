@@ -35,7 +35,7 @@ Meteor.startup(function () {
             );
         }
 
-        Accounts.createUser({username: 'creyl', password: 'forecast'});
+        Accounts.createUser({username: 'creyl', password: 'forecast', profile: {isSuperUser: true}});
 
         console.log('There are', Meteor.users.find({}).count(), " users after startup.");
     }

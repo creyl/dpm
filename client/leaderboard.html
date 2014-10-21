@@ -29,7 +29,7 @@
     <td>{{cash}}</td>
     <td>{{liquidationValue}}</td>
     <td>
-        {{#if currentUser}}
+        {{#if isCurrentOrSuperUser}}
             <input type="button" class="liquidate btn btn-mini btn-primary" value="Liquidate"/>
         {{/if}}
     </td>

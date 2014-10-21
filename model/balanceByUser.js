@@ -38,11 +38,16 @@ function BalanceByUser() {
      * @returns {Mongo.Cursor}
      */
     this.leaderboardView = function () {
+        var loggedInUser = Meteor.userId();
+        var userProfile = loggedInUser ? Meteor.users.findOne(Meteor.userId(), {fields: {profile: 1}}).profile : null;
+        var isSuperUser = (userProfile && userProfile.isSuperUser);
+
         return BalanceByUserCollection.find({}, {
             sort: {profit: -1},
             limit: 10, // return top 10 results
             transform: function (bbu) {
-                bbu.isCurrentUser = (bbu.userId === Meteor.userId());
+                bbu.isCurrentUser = (bbu.userId === loggedInUser);
+                bbu.isCurrentOrSuperUser = (bbu.isCurrentUser || isSuperUser);
                 bbu.username = Meteor.users.findOne(bbu.userId).username;
                 bbu.cash = bbu.cash.toFixed(4);
                 bbu.liquidationValue = bbu.liquidationValue.toFixed(4);
