@@ -43,7 +43,7 @@ Meteor.methods({
         states.updatePayoff(stateId, payoff);
         var postTransactionInvestment = states.calcInvestment();
 
-        PriceAndOpenInterestHistory.addNewEntry(stateId, timeStamp, payoff);
+        priceAndOpenInterestHistory.addNewEntry(stateId, timeStamp, payoff);
         PayoffByUserByState.updateUserPayoff(userId, stateId, payoff);
         states.updateUnitPayoffPrices(UNIT_PAYOFF);
         BalanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);

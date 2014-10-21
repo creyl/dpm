@@ -18,5 +18,5 @@ Meteor.publish("balanceByUser", function () {
 });
 
 Meteor.publish("priceAndOpenInterestHistory", function () {
-    return PriceAndOpenInterestHistory.find();
+    return priceAndOpenInterestHistory.find();
 });

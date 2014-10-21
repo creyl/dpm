@@ -7,7 +7,7 @@ Meteor.startup(function () {
         BalanceByUser.remove({});
         PayoffByUserByState.remove({});
         Transactions.remove({});
-        PriceAndOpenInterestHistory.remove({});
+        priceAndOpenInterestHistory.remove();
 
         var stateId1 = states.insert("Brazil wins", 0, 0, UNIT_PAYOFF);
         var stateId2 = states.insert("Brazil loses", 0, 0, UNIT_PAYOFF);

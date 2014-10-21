@@ -61,7 +61,7 @@ Template.lineChart.rendered = function () {
         var stateNames = states.getNames();
         color.domain(stateNames);
 
-        var dataset = PriceAndOpenInterestHistory.getLast100History();
+        var dataset = priceAndOpenInterestHistory.getLast100History();
         //console.log("dataset", dataset);
 
         var paths = svg.selectAll("path.line")
