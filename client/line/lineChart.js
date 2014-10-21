@@ -58,9 +58,7 @@ Template.lineChart.rendered = function () {
     y.domain([0, 1]);
 
     Deps.autorun(function () {
-        var stateNames = States.find({}, {fields: {name: 1}}).map(function (s) {
-            return s.name;
-        });
+        var stateNames = states.getNames();
         color.domain(stateNames);
 
         var dataset = PriceAndOpenInterestHistory.getLast100History();

@@ -25,8 +25,8 @@ PriceAndOpenInterestHistory.addNewEntry = function (stateId, timeStamp, payoff) 
         stateId: stateId,
         index: paoihIndex + 1,
         timeStamp: timeStamp,
-        openInterest: States.findOne(stateId).payoff,
-        lastPrice: (payoff < 0) ? States.findOne(stateId).unitPayoffBid : States.findOne(stateId).unitPayoffOffer
+        openInterest: states.getPayoff(stateId),
+        lastPrice: (payoff < 0) ? states.getUnitPayoffBid(stateId) : states.getUnitPayoffOffer(stateId)
     });
 };
 
@@ -49,12 +49,12 @@ PriceAndOpenInterestHistory.addNewEntry = function (stateId, timeStamp, payoff) 
  * @returns {Array}
  */
 PriceAndOpenInterestHistory.getLast100History = function () {
-    var that = this;
-    var stateCursor = States.find(); // Not expected to change throughout life of market
+    var self = this;
+    var stateCursor = states.find(); // Not expected to change throughout life of market
     return stateCursor.map(function (state) {
         return {
             name: state.name,
-            values: that.find(
+            values: self.find(
                 {stateId: state._id},
                 {fields: {index: 1, lastPrice: 1}, sort: {index: -1}, limit: 100}
             ).fetch()

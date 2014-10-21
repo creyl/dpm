@@ -1,13 +1,6 @@
 Template.tradeView.helpers({
     states: function () {
-        return States.find({}, {
-            sort: {name: +1},
-            transform: function (state) {
-                state.unitPayoffBid = state.unitPayoffBid.toFixed(4);
-                state.unitPayoffOffer = state.unitPayoffOffer.toFixed(4);
-                return state;
-            }
-        });
+        return states.tradeView();
     },
 
     myPayoff: function () {

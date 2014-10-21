@@ -2,7 +2,7 @@
  * Created by creyl on 10/2/14.
  */
 Meteor.publish('states', function () {
-    return States.find();
+    return states.find();
 });
 
 Meteor.publish('payoffByUserByState', function () {

@@ -2,15 +2,15 @@
 Meteor.startup(function () {
 
         console.log('Creating fixtures at meteor startup');
-        States.remove({});
+        states.remove();
         Meteor.users.remove({});  // REMOVE ALL USERS
         BalanceByUser.remove({});
         PayoffByUserByState.remove({});
         Transactions.remove({});
         PriceAndOpenInterestHistory.remove({});
 
-        var stateId1 = States.insert({name: "Brazil wins", payoff: 0, unitPayoffBid: 0, unitPayoffOffer: UNIT_PAYOFF});
-        var stateId2 = States.insert({name: "Brazil loses", payoff: 0, unitPayoffBid: 0, unitPayoffOffer: UNIT_PAYOFF});
+        var stateId1 = states.insert("Brazil wins", 0, 0, UNIT_PAYOFF);
+        var stateId2 = states.insert("Brazil loses", 0, 0, UNIT_PAYOFF);
 
         var names = [
             "Seed", "Ada Lovelace", "Grace Hopper", "Marie Curie", "Carl Friedrich Gauss",

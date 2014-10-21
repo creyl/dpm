@@ -23,17 +23,17 @@ BalanceByUser.updatePnL = function (userId, preTransactionInvestment, postTransa
         this.insert({userId: userId, cash: 0, liquidationValue: 0, profit: 0});
 
     // Update the P&L for all users
-    var bbuCollection = this;
-    bbuCollection.find({}).forEach(function (bbu) {
+    var self = this;
+    self.find({}).forEach(function (bbu) {
         var payoffArraySortedByState = PayoffByUserByState.getPayoffArraySortedByState(bbu.userId);
 
         var cash = bbu.cash;
         if (bbu.userId === userId)
             cash += preTransactionInvestment - postTransactionInvestment;
 
-        var liquidationValue = States.calcLiquidationValue(payoffArraySortedByState);
+        var liquidationValue = states.calcLiquidationValue(payoffArraySortedByState);
 
-        bbuCollection.update(bbu._id, {
+        self.update(bbu._id, {
             $set: {
                 cash: cash,
                 liquidationValue: liquidationValue,

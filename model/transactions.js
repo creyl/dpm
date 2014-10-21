@@ -39,13 +39,13 @@ Meteor.methods({
         });
         Transactions.logTransaction(transactionId);
 
-        var preTransactionInvestment = States.calcInvestment();
-        States.update(stateId, {$inc: {payoff: payoff}});
-        var postTransactionInvestment = States.calcInvestment();
+        var preTransactionInvestment = states.calcInvestment();
+        states.updatePayoff(stateId, payoff);
+        var postTransactionInvestment = states.calcInvestment();
 
         PriceAndOpenInterestHistory.addNewEntry(stateId, timeStamp, payoff);
         PayoffByUserByState.updateUserPayoff(userId, stateId, payoff);
-        States.updateUnitPayoffPrices(UNIT_PAYOFF);
+        states.updateUnitPayoffPrices(UNIT_PAYOFF);
         BalanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);
     },
 
@@ -75,6 +75,6 @@ Transactions.logTransaction = function (transactionId) {
 
     console.log(Meteor.users.findOne(transaction.userId).username,
         (transaction.payoff > 0) ? "buys" : "sells",
-        "<", States.findOne(transaction.stateId).name, ">",
+        "<", states.getName(transaction.stateId), ">",
         transaction.payoff, "times.");
 };
