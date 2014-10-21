@@ -6,7 +6,7 @@ Meteor.publish('states', function () {
 });
 
 Meteor.publish('payoffByUserByState', function () {
-    return PayoffByUserByState.find();
+    return payoffByUserByState.findAll();
 });
 
 Meteor.publish("userData", function () {

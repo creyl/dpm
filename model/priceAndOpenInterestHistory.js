@@ -2,7 +2,7 @@
  * Created by creyl on 10/20/14.
  */
 /**
- *
+ * Global
  * @type {PriceAndOpenInterestHistory}
  */
 priceAndOpenInterestHistory = new PriceAndOpenInterestHistory();

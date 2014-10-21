@@ -25,7 +25,7 @@ BalanceByUser.updatePnL = function (userId, preTransactionInvestment, postTransa
     // Update the P&L for all users
     var self = this;
     self.find({}).forEach(function (bbu) {
-        var payoffArraySortedByState = PayoffByUserByState.getPayoffArraySortedByState(bbu.userId);
+        var payoffArraySortedByState = payoffByUserByState.getPayoffArraySortedByState(bbu.userId);
 
         var cash = bbu.cash;
         if (bbu.userId === userId)

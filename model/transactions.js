@@ -24,7 +24,7 @@ Meteor.methods({
         check(stateId, String);
         check(payoff, Number);
 
-        if (PayoffByUserByState.isTransactionInvalid(userId, stateId, payoff)) {
+        if (payoffByUserByState.isTransactionInvalid(userId, stateId, payoff)) {
             console.log("TRANSACTION REJECTED: Transaction would cause user", Meteor.users.findOne(userId).username,
                 "to have a negative open interest with incremental payoff", payoff);
             return; // TODO: Throw error
@@ -44,7 +44,7 @@ Meteor.methods({
         var postTransactionInvestment = states.calcInvestment();
 
         priceAndOpenInterestHistory.addNewEntry(stateId, timeStamp, payoff);
-        PayoffByUserByState.updateUserPayoff(userId, stateId, payoff);
+        payoffByUserByState.updateUserPayoff(userId, stateId, payoff);
         states.updateUnitPayoffPrices(UNIT_PAYOFF);
         BalanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);
     },
@@ -58,7 +58,7 @@ Meteor.methods({
         check(bbuId, String);
 
         var userId = BalanceByUser.findOne(bbuId).userId;
-        PayoffByUserByState.find({userId: userId}).forEach(
+        payoffByUserByState.find(userId).forEach(
             function (pbubs) {
                 Meteor.call("addTransaction", userId, pbubs.stateId, -pbubs.payoff);
             }

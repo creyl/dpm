@@ -5,7 +5,7 @@ Meteor.startup(function () {
         states.remove();
         Meteor.users.remove({});  // REMOVE ALL USERS
         BalanceByUser.remove({});
-        PayoffByUserByState.remove({});
+        payoffByUserByState.remove();
         Transactions.remove({});
         priceAndOpenInterestHistory.remove();
 

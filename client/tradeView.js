@@ -4,8 +4,7 @@ Template.tradeView.helpers({
     },
 
     myPayoff: function () {
-        var payoffByUserByState = PayoffByUserByState.findOne({userId: Meteor.userId(), stateId: this._id});
-        return payoffByUserByState ? payoffByUserByState.payoff : 0;
+        return payoffByUserByState.getPayoff(Meteor.userId(), this._id);
     }
 });
 
