@@ -14,7 +14,7 @@ Meteor.publish("userData", function () {
 });
 
 Meteor.publish("balanceByUser", function () {
-    return BalanceByUser.find();
+    return balanceByUser.findAll();
 });
 
 Meteor.publish("priceAndOpenInterestHistory", function () {

@@ -46,18 +46,17 @@ Meteor.methods({
         priceAndOpenInterestHistory.addNewEntry(stateId, timeStamp, payoff);
         payoffByUserByState.updateUserPayoff(userId, stateId, payoff);
         states.updateUnitPayoffPrices(UNIT_PAYOFF);
-        BalanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);
+        balanceByUser.updatePnL(userId, preTransactionInvestment, postTransactionInvestment);
     },
 
     /**
      * This function liquidates a user's position.
      * Must be global.
-     * @param {string} bbuId
+     * @param {string} userId
      */
-    liquidate: function (bbuId) {
-        check(bbuId, String);
+    liquidate: function (userId) {
+        check(userId, String);
 
-        var userId = BalanceByUser.findOne(bbuId).userId;
         payoffByUserByState.find(userId).forEach(
             function (pbubs) {
                 Meteor.call("addTransaction", userId, pbubs.stateId, -pbubs.payoff);

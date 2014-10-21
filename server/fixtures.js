@@ -4,7 +4,7 @@ Meteor.startup(function () {
         console.log('Creating fixtures at meteor startup');
         states.remove();
         Meteor.users.remove({});  // REMOVE ALL USERS
-        BalanceByUser.remove({});
+        balanceByUser.remove();
         payoffByUserByState.remove();
         Transactions.remove({});
         priceAndOpenInterestHistory.remove();
