@@ -12,20 +12,22 @@ Meteor.startup(function () {
         var stateId1 = states.insert("Brazil wins", 0, 0, UNIT_PAYOFF);
         var stateId2 = states.insert("Brazil loses", 0, 0, UNIT_PAYOFF);
 
-        var names = [
-            "Seed", "Ada Lovelace", "Grace Hopper", "Marie Curie", "Carl Friedrich Gauss",
-            "Nikola Tesla"];
-        var userId = [, , , , ,];
-        for (var i = 0; i < names.length; i++) {
-            userId[i] = Accounts.createUser({username: names[i]});
-        }
+        var seedUserId = Accounts.createUser({
+            username: "Seed", password: "666666", profile: {isSeed: true}
+        });
 
         // Seed user buys uniform payoff profile
-        Meteor.call("addTransaction", userId[0], stateId1, UNIT_PAYOFF * 100);
-        Meteor.call("addTransaction", userId[0], stateId2, UNIT_PAYOFF * 100);
+        Meteor.call("addTransaction", seedUserId, stateId1, UNIT_PAYOFF * 100);
+        Meteor.call("addTransaction", seedUserId, stateId2, UNIT_PAYOFF * 100);
 
-        var nUsers = Meteor.users.find({}).count();
-        for (i = 1; i < 100; i++) {
+        var names = ["Ada Lovelace", "Grace Hopper", "Marie Curie", "Carl Friedrich Gauss", "Nikola Tesla"];
+        var userId = [];
+        names.forEach(function (name) {
+            userId.push(Accounts.createUser({username: name, password: "666666"}));
+        });
+
+        var nUsers = names.length;
+        for (var i = 0; i < 100; i++) {
             Meteor.call("addTransaction",
                 userId[i % nUsers],
                 (i % 2) === 0 ? stateId1 : stateId2,

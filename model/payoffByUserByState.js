@@ -29,7 +29,7 @@ function PayoffByUserByState() {
      * @param {number} payoff
      * @returns {boolean}
      */
-    this.isTransactionInvalid = function (userId, stateId, payoff) {
+    this.isResultingPayoffNegative = function (userId, stateId, payoff) {
         var payoffCursor = PayoffByUserByStateCollection.find({userId: userId, stateId: stateId});
         return (((payoffCursor.count() === 0) && (payoff < 0)) ||
         (payoff + payoffCursor.fetch().payoff < 0));

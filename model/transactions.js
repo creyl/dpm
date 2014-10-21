@@ -71,10 +71,19 @@ Meteor.methods({
         check(stateId, String);
         check(payoff, Number);
 
-        if (payoffByUserByState.isTransactionInvalid(userId, stateId, payoff)) {
+        if (payoffByUserByState.isResultingPayoffNegative(userId, stateId, payoff)) {
             console.log("TRANSACTION REJECTED: Transaction would cause user", Meteor.users.findOne(userId).username,
                 "to have a negative open interest with incremental payoff", payoff);
             return null; // TODO: Throw error
+        }
+
+        if (payoff > 0) {
+            var cost = states.getUnitPayoffOffer(stateId) * payoff; //  This is an approximation!!!
+            if (balanceByUser.isResultingCashLimitExceeded(userId, cost)) {
+                console.log("TRANSACTION REJECTED: Transaction would cause user", Meteor.users.findOne(userId).username,
+                    "'s cash balance", balanceByUser.getCashBalance(userId), "to drop below the minimum allowed.");
+                return null;
+            }
         }
 
         var timeStamp = new Date();

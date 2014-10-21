@@ -47,7 +47,7 @@ function States() {
     };
 
     /**
-     *
+     * Increases payoff on stateId by incremental payoff
      * @param {string} stateId
      * @param {number} incrementalPayoff
      */

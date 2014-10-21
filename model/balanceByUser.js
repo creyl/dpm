@@ -23,6 +23,12 @@ function BalanceByUser() {
      */
     var BalanceByUserCollection = new Mongo.Collection("balanceByUser");
 
+    /**
+     * Constant describing the minimum cash levels available to participants on the system
+     * @type {number}
+     */
+    var MIN_CASH = -10;
+
     this.findAll = function () {
         return BalanceByUserCollection.find();
     };
@@ -48,6 +54,31 @@ function BalanceByUser() {
 
     this.remove = function () {
         BalanceByUserCollection.remove({});
+    };
+
+    /**
+     *
+     * @param {string} userId
+     * @returns {number}
+     */
+    this.getCashBalance = function (userId) {
+        var bbu = BalanceByUserCollection.findOne({userId: userId}, {fields: {cash: 1}});
+        return bbu ? bbu.cash : 0;
+    };
+
+    /**
+     * Returns whether a contemplated transaction would drop a user's cash level below the minimum.
+     * @param userId
+     * @param cost
+     * @returns {boolean}
+     */
+    this.isResultingCashLimitExceeded = function (userId, cost) {
+        var profile = Meteor.users.findOne(userId).profile;
+        if (profile && profile.isSeed)
+            return false;
+
+        var cash = this.getCashBalance(userId);
+        return (cash - cost < MIN_CASH);
     };
 
     /**
