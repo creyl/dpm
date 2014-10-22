@@ -4,6 +4,9 @@
 Template.leaderboard.helpers({
     topParticipants: function () {
         return balanceByUser.leaderboardView();
+    },
+    currentBbu: function () {
+        return balanceByUser.currentBbuView();
     }
 });
 

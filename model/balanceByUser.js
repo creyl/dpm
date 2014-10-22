@@ -42,19 +42,44 @@ function BalanceByUser() {
         var userProfile = loggedInUser ? Meteor.users.findOne(Meteor.userId(), {fields: {profile: 1}}).profile : null;
         var isSuperUser = (userProfile && userProfile.isSuperUser);
 
-        return BalanceByUserCollection.find({}, {
+        var bbus = BalanceByUserCollection.find({}, {
             sort: {profit: -1},
             limit: 10, // return top 10 results
             transform: function (bbu) {
-                bbu.isCurrentUser = (bbu.userId === loggedInUser);
-                bbu.isCurrentOrSuperUser = (bbu.isCurrentUser || isSuperUser);
+                bbu.showLiquidateButton = isSuperUser;
                 bbu.username = Meteor.users.findOne(bbu.userId).username;
-                bbu.cash = bbu.cash.toFixed(4);
-                bbu.liquidationValue = bbu.liquidationValue.toFixed(4);
-                bbu.profit = bbu.profit.toFixed(4);
+                bbu.cash4 = bbu.cash.toFixed(4);
+                bbu.liquidationValue4 = bbu.liquidationValue.toFixed(4);
+                bbu.profit4 = bbu.profit.toFixed(4);
                 return bbu;
             }
         });
+
+        return bbus.map(function (bbu, index) {
+            bbu.rank = ++index;
+            return bbu;
+        });
+    };
+
+    /**
+     *
+     * @returns {Object}
+     */
+    this.currentBbuView = function () {
+        var loggedInUser = Meteor.userId();
+
+        var currentBbu = BalanceByUserCollection.findOne({userId: loggedInUser}, {
+            transform: function (bbu) {
+                bbu.showLiquidateButton = true;
+                bbu.username = Meteor.users.findOne(bbu.userId).username + " (YOU)";
+                bbu.cash4 = bbu.cash.toFixed(4);
+                bbu.liquidationValue4 = bbu.liquidationValue.toFixed(4);
+                bbu.profit4 = bbu.profit.toFixed(4);
+                return bbu;
+            }
+        });
+        currentBbu.rank = BalanceByUserCollection.find({profit: {$gt: currentBbu.profit}}).count() + 1;
+        return currentBbu;
     };
 
     this.remove = function () {

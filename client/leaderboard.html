@@ -1,8 +1,9 @@
 <template name="leaderboard">
     <div>
         <table class="table table-condensed">
-            <caption>TOP 10 LEADERBOARD</caption>
+            <caption>YOU AND THE TOP 10 P&L LEADERBOARD</caption>
             <tr>
+                <th>Rank</th>
                 <th>Participant</th>
                 <th><abbr title="Profit & Loss: Sum of the Cash and Liquidation Value">P&L</abbr></th>
                 <th><abbr title="Balance of virtual money">Cash</abbr></th>
@@ -11,12 +12,13 @@
                 <th></th>
             </tr>
             <tbody>
+            {{#if currentUser}}
+                {{#with currentBbu}}
+                    <tr class="success">{{> bbu}}</tr>
+                {{/with}}
+            {{/if}}
             {{#each topParticipants}}
-                {{#if isCurrentUser}}
-                    <tr class="info">{{> bbu}}</tr>
-                {{else}}
-                    <tr>{{> bbu}}</tr>
-                {{/if}}
+                <tr>{{> bbu}}</tr>
             {{/each}}
             </tbody>
         </table>
@@ -24,12 +26,13 @@
 </template>
 
 <template name="bbu">
+    <td>#{{rank}}</td>
     <td>{{username}}</td>
-    <td>{{profit}}</td>
-    <td>{{cash}}</td>
-    <td>{{liquidationValue}}</td>
+    <td>{{profit4}}</td>
+    <td>{{cash4}}</td>
+    <td>{{liquidationValue4}}</td>
     <td>
-        {{#if isCurrentOrSuperUser}}
+        {{#if showLiquidateButton}}
             <input type="button" class="liquidate btn btn-mini btn-primary" value="Liquidate"/>
         {{/if}}
     </td>

@@ -112,7 +112,8 @@ Meteor.methods({
 
         payoffByUserByState.find(userId).forEach(
             function (pbubs) {
-                Meteor.call("addTransaction", userId, pbubs.stateId, -pbubs.payoff);
+                if (pbubs.payoff > 0)
+                    Meteor.call("addTransaction", userId, pbubs.stateId, -pbubs.payoff);
             }
         );
     }
