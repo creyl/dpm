@@ -29,6 +29,18 @@ function BalanceByUser() {
      */
     var MIN_CASH = -10;
 
+    /**
+     *
+     * @returns {number}
+     */
+    this.getMinCash = function () {
+        return MIN_CASH;
+    };
+
+    /**
+     *
+     * @returns {Mongo.Cursor}
+     */
     this.findAll = function () {
         return BalanceByUserCollection.find();
     };
@@ -104,7 +116,7 @@ function BalanceByUser() {
      */
     this.isResultingCashLimitExceeded = function (userId, cost) {
         var profile = Meteor.users.findOne(userId).profile;
-        if (profile && profile.isSeed)
+        if (profile && profile.isSponsor)
             return false;
 
         var cash = this.getCashBalance(userId);

@@ -5,6 +5,16 @@ Template.tradeView.helpers({
 
     myPayoff: function () {
         return payoffByUserByState.getPayoff(Meteor.userId(), this._id);
+    },
+
+    enoughCash: function () {
+        var userId = Meteor.userId();
+        if (userId) {
+            var cost = states.getUnitPayoffOffer(this._id);
+            return (!balanceByUser.isResultingCashLimitExceeded(userId, cost));
+        }
+        else
+            return false;
     }
 });
 

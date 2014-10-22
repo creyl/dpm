@@ -7,6 +7,9 @@ Template.leaderboard.helpers({
     },
     currentBbu: function () {
         return balanceByUser.currentBbuView();
+    },
+    maxBorrow: function () {
+        return -balanceByUser.getMinCash();
     }
 });
 

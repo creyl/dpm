@@ -13,7 +13,7 @@ Meteor.startup(function () {
         var stateId2 = states.insert("Brazil loses", 0, 0, UNIT_PAYOFF);
 
         var seedUserId = Accounts.createUser({
-            username: "Seed", password: "666666", profile: {isSeed: true}
+            username: "Sponsor", password: "666666", profile: {isSponsor: true}
         });
 
         // Seed user buys uniform payoff profile
@@ -35,7 +35,7 @@ Meteor.startup(function () {
             );
         }
 
-        Accounts.createUser({username: 'creyl', password: 'forecast', profile: {isSuperUser: true}});
+        Accounts.createUser({username: 'superuser', password: 'forecast', profile: {isSuperUser: true}});
 
         console.log('There are', Meteor.users.find({}).count(), " users after startup.");
     }

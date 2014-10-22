@@ -1,12 +1,12 @@
 <template name="leaderboard">
     <div>
-        <table class="table table-condensed">
+        <table class="table table-condensed table-hover">
             <caption>YOU AND THE TOP 10 P&L LEADERBOARD</caption>
             <tr>
-                <th>Rank</th>
+                <th><abbr title="Ranking by P&L">Rank</abbr></th>
                 <th>Participant</th>
                 <th><abbr title="Profit & Loss: Sum of the Cash and Liquidation Value">P&L</abbr></th>
-                <th><abbr title="Balance of virtual money">Cash</abbr></th>
+                <th><abbr title="Balance of virtual money. Borrowing cannot exceed ${{maxBorrow}}.">Cash</abbr></th>
                 <th><abbr title="Virtual money you would get if you sold every $1-payoff contract now">Liquidation
                     Value</abbr></th>
                 <th></th>
@@ -14,7 +14,7 @@
             <tbody>
             {{#if currentUser}}
                 {{#with currentBbu}}
-                    <tr class="success">{{> bbu}}</tr>
+                    <tr class="info">{{> bbu}}</tr>
                 {{/with}}
             {{/if}}
             {{#each topParticipants}}

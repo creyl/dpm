@@ -1,6 +1,6 @@
 <template name="tradeView">
     <div>
-        <table class="table table-condensed">
+        <table class="table table-condensed table-hover">
             <caption>INFORMATION TRADING</caption>
             <tr>
                 <th>Outcome</th>
@@ -15,6 +15,7 @@
                 <th><abbr title="Price at which a $1-payoff contract can be bought now">Offer</abbr></th>
                 <th></th>
             </tr>
+            <tbody>
             {{#each states}}
                 <tr>
                     <td>{{name}}</td>
@@ -33,13 +34,19 @@
                     <td>{{unitPayoffOffer}}</td>
                     <td>
                         {{#if currentUser}}
-                            <input type="button" class="buy btn btn-mini btn-warning" value="Buy"/>
+                            {{#if enoughCash}}
+                                <input type="button" class="buy btn btn-mini btn-warning" value="Buy"/>
+                            {{else}}
+                                <input type="button" class="disabled btn btn-mini btn-warning" value="Buy"/>
+                                <span class="label label-warning">Not enough cash</span>
+                            {{/if}}
                         {{else}}
                             <input type="button" class="disabled btn btn-mini btn-warning" value="Buy"/>
                         {{/if}}
                     </td>
                 </tr>
             {{/each}}
+            </tbody>
         </table>
     </div>
 </template>
