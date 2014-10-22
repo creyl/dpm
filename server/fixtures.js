@@ -12,18 +12,18 @@ Meteor.startup(function () {
         var stateId1 = states.insert("Brazil wins", 0, 0, UNIT_PAYOFF);
         var stateId2 = states.insert("Brazil loses", 0, 0, UNIT_PAYOFF);
 
-        var seedUserId = Accounts.createUser({
+        var sponsorUserId = Accounts.createUser({
             username: "Sponsor", password: "666666", profile: {isSponsor: true}
         });
 
         // Seed user buys uniform payoff profile
-        Meteor.call("addTransaction", seedUserId, stateId1, UNIT_PAYOFF * 100);
-        Meteor.call("addTransaction", seedUserId, stateId2, UNIT_PAYOFF * 100);
+        Meteor.call("addTransaction", sponsorUserId, stateId1, UNIT_PAYOFF * 100);
+        Meteor.call("addTransaction", sponsorUserId, stateId2, UNIT_PAYOFF * 100);
 
         var names = ["Ada Lovelace", "Grace Hopper", "Marie Curie", "Carl Friedrich Gauss", "Nikola Tesla"];
         var userId = [];
         names.forEach(function (name) {
-            userId.push(Accounts.createUser({username: name, password: "666666"}));
+            userId.push(Accounts.createUser({username: name, password: "666666", profile: {}}));
         });
 
         var nUsers = names.length;

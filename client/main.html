@@ -5,45 +5,46 @@
 </head>
 
 <body>
-<div class="navbar navbar-fixed-top navbar-inverse">
-    <div class="navbar-inner">
-        <a class="brand" href="#">Forecast Factory (beta)</a>
-        <ul class="nav pull-right">
-            <li>{{> loginButtons}}</li>
-            <li></li>
-            {{#unless currentUser}}
-                <li><span class="label label-info">&lt;== Sign in to start trading!</span></li>
-            {{/unless}}
-        </ul>
+<div class="container">
+    <div class="navbar navbar-fixed-top navbar-inverse">
+        <div class="navbar-inner">
+            <a class="brand" href="#">Forecast Factory (beta)</a>
+            <ul class="nav pull-right">
+                <li>{{> loginButtons}}</li>
+                <li></li>
+                {{#unless currentUser}}
+                    <li><span class="label label-info">&lt;== Sign in to start trading!</span></li>
+                {{/unless}}
+            </ul>
+        </div>
     </div>
-</div>
 
-<div>
-    {{> tradeView}}
-</div>
-
-<div>
-    {{> leaderboard}}
-</div>
-
-<div>
-    {{> lineChart}}
-</div>
-
-<footer>
-    <div class="well">
-        <p>
-            The Forecast Factory provides a marketplace for information trading.
-            The currency is virtual. There is no exchange of actual money, neither among participants,
-            nor between the participants and the Forecast Factory.
-            Participants borrow virtual money up to some maximum amount, which they can use to buy, and
-            subsequently sell,
-            individual $1-payoff contracts. These contracts pay $1 upon realization of a given outcome. Trading is
-            real-time.
-            Through skillful trading, participants can generate a virtual profit (positive P&L) and get their
-            names on the leaderboard.
-        </p>
+    <div>
+        {{> tradeView}}
     </div>
-    <p>Copyright © 2014 All Rights Reserved</p>
-</footer>
+
+    <div>
+        {{> leaderboard}}
+    </div>
+
+    <div>
+        {{> lineChart}}
+    </div>
+
+    <footer>
+        <div class="well">
+            <p>
+                The Forecast Factory provides a marketplace for information trading.
+                The currency is virtual. There is no exchange of actual money, neither among participants,
+                nor between the participants and the Forecast Factory.
+                Participants borrow virtual money up to some maximum amount, which they can use to buy
+                individual $1-payoff contracts. These contracts pay $1 upon realization of a given outcome and can be
+                sold back to the Forecast Factory at any time. Trading is real-time.
+                Through skillful trading, participants can generate a virtual profit (positive P&L) and get their
+                names on the leaderboard.
+            </p>
+        </div>
+        <p>Copyright © 2014 All Rights Reserved</p>
+    </footer>
+</div>
 </body>
