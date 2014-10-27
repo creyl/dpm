@@ -9,8 +9,8 @@ Meteor.startup(function () {
         transactions.remove();
         priceAndOpenInterestHistory.remove();
 
-        var stateId1 = states.insert("Brazil wins", 0, 0, UNIT_PAYOFF);
-        var stateId2 = states.insert("Brazil loses", 0, 0, UNIT_PAYOFF);
+        var stateId1 = states.insert("The S&P500 closes at or above 2000 on 12/31/2014", 0, 0, UNIT_PAYOFF);
+        var stateId2 = states.insert("The S&P500 closes below 2000 on 12/31/2014", 0, 0, UNIT_PAYOFF);
 
         var sponsorUserId = Accounts.createUser({
             username: "Sponsor", password: "666666", profile: {isSponsor: true}
