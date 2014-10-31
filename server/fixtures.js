@@ -1,6 +1,7 @@
 // On server startup, wipe out database and create states, users and transactions.
 Meteor.startup(function () {
 
+        //if (states.find().count() === 0) {
         console.log('Creating fixtures at meteor startup');
         states.remove();
         Meteor.users.remove({});  // REMOVE ALL USERS
@@ -39,4 +40,5 @@ Meteor.startup(function () {
 
         console.log('There are', Meteor.users.find({}).count(), " users after startup.");
     }
+    //}
 );
